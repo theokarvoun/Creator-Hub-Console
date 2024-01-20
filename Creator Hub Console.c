@@ -17,7 +17,7 @@ int main(void){
 		printf("%s\n",auth?"Admin mode":"User mode");
 		printf("Use .help to show commands%s\n",auth?", use !help to show all admin commands":"");
 		printf("> ");
-		gets(userInput);
+		scanf("%s",userInput);
 		switch (userInput[0]){
 			case '.':{
 				if (strcmp(userInput,".help")==0){
@@ -53,7 +53,7 @@ void authorise(void){
 	char user[50];
 	int password;
 	printf("Enter username: ");
-	gets(user);
+	scanf("%s",user);
 	printf("Enter password: ");
 	scanf("%d",&password);
 	if ((strcmp(user,username)==0)&&(password==pass)){
