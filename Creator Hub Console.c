@@ -15,7 +15,7 @@ int main(void){
 	char userInput[100];
 	do{
 		printf("%s\n",auth?"Admin mode":"User mode");
-		printf("Use .help to show commands\n");
+		printf("Use .help to show commands%s\n",auth?", use !help to show all admin commands":"");
 		printf("> ");
 		gets(userInput);
 		switch (userInput[0]){
