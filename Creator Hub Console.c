@@ -14,6 +14,7 @@ bool auth = false;
 int main(void){
 	char userInput[100];
 	do{
+		printf("%s\n",auth?"Admin mode":"User mode");
 		printf("Use .help to show commands\n");
 		printf("> ");
 		gets(userInput);
