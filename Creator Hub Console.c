@@ -18,6 +18,10 @@ int main(void){
 		printf("Use .help to show commands%s\n",auth?", use !help to show all admin commands":"");
 		printf("> ");
 		scanf("%s",userInput);
+//		fgets(userInput,100,stdin);
+//		if (strlen(userInput)<99){
+//			userInput[strlen(userInput)-1]='\0';
+//		}
 		switch (userInput[0]){
 			case '.':{
 				if (strcmp(userInput,".help")==0){
@@ -53,6 +57,10 @@ void authorise(void){
 	char user[50];
 	int password;
 	printf("Enter username: ");
+//	fgets(user,50,stdin);
+//	if (strlen(user)<49){
+//		user[strlen(user)-1]='\0';
+//	}
 	scanf("%s",user);
 	printf("Enter password: ");
 	scanf("%d",&password);
