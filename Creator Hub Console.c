@@ -12,8 +12,8 @@ const int pass=123456;
 bool auth = false;
 
 int main(void){
-	char userInput[100];
-	do{
+	char userInput[100]={0};
+	while (strcmp(userInput,".exit")!=0){
 		printf("%s\n",auth?"Admin mode":"User mode");
 		printf("Use .help to show commands%s\n",auth?", use !help to show all admin commands":"");
 		printf("> ");
@@ -44,7 +44,7 @@ int main(void){
 			}
 		}
 		
-	} while (strcmp(userInput,".exit")!=0);
+	}
 	
 	return 0;
 }
