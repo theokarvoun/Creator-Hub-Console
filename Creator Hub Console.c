@@ -123,14 +123,22 @@ void createModsFolder(void){
 }
 
 void writeToConfig(void){
-	FILE *fptr = fopen("config.txt","w");
+	FILE *fptr = fopen("config.cfg","w");
+	if (fptr==NULL){
+		printf("Error opening file\n");
+		return;
+	}
 	fprintf(fptr,"auth:%d\nmoded:%d",auth?1:0,moded?1:0);
 	fclose(fptr);
 }
 
 void readConfig(void){
 	int temp_auth,temp_mod;
-	FILE *fptr = fopen("config.txt","r");
+	FILE *fptr = fopen("config.cfg","r");
+	if (fptr==NULL){
+		printf("Error opening file\n");
+		return;
+	}
 	fscanf(fptr,"auth:%d\nmoded:%d",&temp_auth,&temp_mod);
 	fclose(fptr);
 	if (temp_auth==1){
