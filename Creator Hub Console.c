@@ -3,12 +3,26 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/stat.h>
+#include <time.h>
+
+typedef struct DateTime {
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+    int second;
+}DATETIME;
 
 void authorise(void);
 void createProject(void);
 void createModsFolder(void);
 void writeToConfig(void);
-void readConfig(void);
+int readConfig(void);
+void wipeConfig(void);
+void bugReport(char *reason);
+DATETIME getCurrentDateTime(void);
+void debug(void);
 
 const char username[]="admin";
 const int pass=123456;
@@ -43,6 +57,7 @@ int main(void){
 				}
 				if (strcmp(userInput,".authorise")==0){
 					authorise();
+					writeToConfig();
 				}
 				if (strcmp(userInput,".project-n")==0){
 					createProject();
@@ -60,11 +75,22 @@ int main(void){
 						printf(".authorise: enter username and password to access more features\n");
 						printf(".project-n: create new project folder\n");
 						printf("!mods-enable: enables modding and creates a mods folder\n");
+						printf("!cfg-update: reads the cfg file and updates the app accordingly\n");
 						printf(".exit: exit the program\n");
 					}
 					if (strcmp(userInput,"!mods-enable")==0){
 						createModsFolder();
+					}
+					if (strcmp(userInput,"!cfg-update")){
+						readConfig();
 					}	
+				}
+				break;
+			}
+			case '-':{
+				if (strcmp(userInput,"-debug")){
+					system("cls");
+					debug();
 				}
 				break;
 			}
@@ -77,6 +103,13 @@ int main(void){
 	}
 	writeToConfig();
 	return 0;
+}
+
+void bugReport(char *reason){
+	FILE *fptr = fopen("bugreport.txt","a");
+	DATETIME current = getCurrentDateTime();
+	fprintf(fptr,"%d/%d/%d | %d:%d:%d | %s",current.day,current.month,current.year,current.hour,current.minute,current.second,reason);
+	fclose(fptr);
 }
 
 void authorise(void){
@@ -132,12 +165,12 @@ void writeToConfig(void){
 	fclose(fptr);
 }
 
-void readConfig(void){
+int readConfig(void){
 	int temp_auth,temp_mod;
 	FILE *fptr = fopen("config.cfg","r");
 	if (fptr==NULL){
 		printf("Error opening file\n");
-		return;
+		return -1;
 	}
 	fscanf(fptr,"auth:%d\nmoded:%d",&temp_auth,&temp_mod);
 	fclose(fptr);
@@ -150,5 +183,43 @@ void readConfig(void){
 		moded=true;
 	} else {
 		moded=false;
+	}
+	return 0;
+}
+
+DATETIME getCurrentDateTime(void){
+	struct DateTime currentDateTime;
+    time_t currentTime;
+    time(&currentTime);
+    struct tm *localTime = localtime(&currentTime);
+    currentDateTime.year = localTime->tm_year + 1900;
+    currentDateTime.month = localTime->tm_mon + 1;
+    currentDateTime.day = localTime->tm_mday;
+    currentDateTime.hour = localTime->tm_hour;
+    currentDateTime.minute = localTime->tm_min;
+    currentDateTime.second = localTime->tm_sec;
+    return currentDateTime;
+}
+
+void wipeConfig(void){
+	FILE *fptr = fopen("config.cfg","w");
+	if (fptr==NULL){
+		printf("Error opening file\n");
+		return;
+	}
+	fprintf(fptr,"NULL");
+	fclose(fptr);
+}
+
+void debug(void){
+	int count=0;
+	system("cls");
+	while (readConfig()==-1&&count<5){
+		writeToConfig();
+		count++;
+	}
+	if (count==5){
+		wipeConfig();
+		bugReport("Error_Failed_To_Read_Config\n");
 	}
 }
