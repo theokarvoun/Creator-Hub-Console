@@ -22,7 +22,7 @@ int readConfig(void);
 void wipeConfig(void);
 void bugReport(char *reason);
 DATETIME getCurrentDateTime(void);
-void debug(void);
+void debugcfg(void);
 
 const char username[]="admin";
 const int pass=123456;
@@ -81,16 +81,25 @@ int main(void){
 					if (strcmp(userInput,"!mods-enable")==0){
 						createModsFolder();
 					}
-					if (strcmp(userInput,"!cfg-update")){
+					if (strcmp(userInput,"!cfg-update")==0){
 						readConfig();
 					}	
 				}
 				break;
 			}
 			case '-':{
-				if (strcmp(userInput,"-debug")){
+				if (strcmp(userInput,"-help")==0){
+					printf("Debug commands:\n");
+					printf("-help: shows debug commands\n");
+					printf("-debugcfg: Tries to write to config, wipes config and logs bug if it fails\n");
+					printf("-wipecfg: Manually wipes the config file\n");
+				}
+				if (strcmp(userInput,"-debugcfg")==0){
 					system("cls");
-					debug();
+					debugcfg();
+				}
+				if (strcmp(userInput,"-wipecfg")==0){
+					wipeConfig();
 				}
 				break;
 			}
@@ -211,7 +220,7 @@ void wipeConfig(void){
 	fclose(fptr);
 }
 
-void debug(void){
+void debugcfg(void){
 	int count=0;
 	system("cls");
 	while (readConfig()==-1&&count<5){
