@@ -28,19 +28,23 @@ void debug(void);
 void createNote(const char *folderName, const char *fileName);
 void globalNote(void);
 void globalNoteWipe(void);
+
 const char username[]="admin";
 const int pass=123456;
 //username and password are temporary
 
 bool auth;
 bool moded;
+bool cleanMode;
 
 int main(void){
 	readConfig();
 	char userInput[100]={0};
 	while (strcmp(userInput,".exit")!=0){
-		printf("%s\n",auth?"Admin mode":"User mode");
-		printf("Use .help to show commands%s\n",auth?", use !help to show all admin commands":"");
+		if (cleanMode==false){
+			printf("%s\n",auth?"Admin mode":"User mode");
+			printf("Use .help to show commands%s\n",auth?", use !help to show all admin commands":"");	
+		}
 		printf("> ");
 		scanf("%s",userInput);
 //		fgets(userInput,100,stdin);
@@ -51,6 +55,8 @@ int main(void){
 			case '.':{
 				if (strcmp(userInput,".help")==0){
 					printf(".help: shows available commands\n");
+					printf(".cleanMode-on: enables clean mode\n");
+					printf(".cleanMode-off: disables clean mode\n");
 					printf(".clear: clears the console\n");
 					printf(".authorise: enter username and password to access more features\n");
 					printf(".project-n: create new project folder\n");
@@ -79,6 +85,12 @@ int main(void){
                 }
                 if (strcmp(userInput,".note-a")==0){
                 	globalNote();
+				}
+				if (strcmp(userInput,".cleanMode-on")==0){
+					cleanMode=true;
+				}
+				if (strcmp(userInput,".cleanMode-off")==0){
+					cleanMode=false;
 				}
 				break;
 			}
@@ -194,18 +206,18 @@ void writeToConfig(void){
 		printf("Error opening file\n");
 		return;
 	}
-	fprintf(fptr,"auth:%d\nmoded:%d",auth?1:0,moded?1:0);
+	fprintf(fptr,"auth:%d\nmoded:%d\ncleanMode:%d",auth?1:0,moded?1:0,cleanMode?1:0);
 	fclose(fptr);
 }
 
 int readConfig(void){
-	int temp_auth,temp_mod;
+	int temp_auth,temp_mod,temp_clean;
 	FILE *fptr = fopen("config.cfg","r");
 	if (fptr==NULL){
 		printf("Error opening file\n");
 		return -1;
 	}
-	fscanf(fptr,"auth:%d\nmoded:%d",&temp_auth,&temp_mod);
+	fscanf(fptr,"auth:%d\nmoded:%d\ncleanMode:%d",&temp_auth,&temp_mod,&temp_clean);
 	fclose(fptr);
 	if (temp_auth==1){
 		auth=true;
@@ -216,6 +228,11 @@ int readConfig(void){
 		moded=true;
 	} else {
 		moded=false;
+	}
+	if (temp_clean==1){
+		cleanMode=true;
+	} else {
+		cleanMode=false;
 	}
 	return 0;
 }
