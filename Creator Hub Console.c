@@ -103,6 +103,8 @@ int main(void){
 					if (strcmp(userInput,"!help")==0){
 						printf(".help: shows available commands\n");
 						printf("!help: shows all commands\n");
+						printf(".cleanMode-on: enables clean mode\n");
+						printf(".cleanMode-off: disables clean mode\n");
 						printf(".clear: clears the console\n");
 						printf(".authorise: enter username and password to access more features\n");
 						printf(".project-n: create new project folder\n");
@@ -110,6 +112,7 @@ int main(void){
                         printf(".note-a: add notes to global note\n");
 						printf("!mods-enable: enables modding and creates a mods folder\n");
 						printf("!cfg-update: reads the cfg file and updates the app accordingly\n");
+						printf("!reset: resets the app to default\n");
 						printf(".exit: exit the program\n");
 					}
 					if (strcmp(userInput,"!mods-enable")==0){
@@ -117,6 +120,24 @@ int main(void){
 					}
 					if (strcmp(userInput,"!cfg-update")==0){
 						readConfig();
+					}
+					if (strcmp(userInput,"!reset")==0){
+						char selection;
+						printf("Are you sure(y/n):");
+						getchar();
+						scanf("%c",&selection);
+						switch (selection){
+							case 'y':{
+								auth=false;
+								moded=false;
+								cleanMode=false;
+								writeToConfig();
+								system("cls");
+								printf("Reset successful\n");
+								break;
+							}
+						}
+						
 					}	
 				}
 				break;
