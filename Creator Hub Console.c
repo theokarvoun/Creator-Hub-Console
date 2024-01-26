@@ -39,7 +39,7 @@ bool cleanMode;
 
 int main(void){
 	readConfig();
-	char userInput[100]={0};
+	char userInput[100];
 	while (strcmp(userInput,".exit")!=0){
 		if (cleanMode==false){
 			printf("%s\n",auth?"Admin mode":"User mode");
@@ -47,6 +47,7 @@ int main(void){
 		}
 		printf("> ");
 		scanf("%s",userInput);
+//		getchar();
 //		fgets(userInput,100,stdin);
 //		if (strlen(userInput)<99){
 //			userInput[strlen(userInput)-1]='\0';
