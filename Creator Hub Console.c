@@ -26,6 +26,7 @@ void bugReport(char *reason);
 DATETIME getCurrentDateTime(void);
 void debug(void);
 void createNote(const char *folderName, const char *fileName);
+void wipeProjectNote(const char *folderName, const char *fileName);
 void globalNote(void);
 void globalNoteWipe(void);
 
@@ -127,6 +128,7 @@ int main(void){
 					printf("-debug: Tries to write to config, wipes config and logs bug if it fails\n");
 					printf("-wipecfg: Manually wipes the config file\n");
 					printf("-wipeGlobalnotes: Wipes the contents of the global note file\n");
+					printf("-wipeProjectNote: Wipes the contents of a note file of a specific project\n");
 				}
 				if (strcmp(userInput,"-debug")==0){
 					system("cls");
@@ -137,6 +139,15 @@ int main(void){
 				}
 				if (strcmp(userInput,"-wipeGlobalnotes")==0){
 					globalNoteWipe();
+				}
+				if (strcmp(userInput,"-wipeProjectNote")==0){
+					char projectName[100];
+                    char noteName[100];
+                    printf("Give project name: ");
+                    scanf("%s",projectName);
+                    strcpy(noteName,projectName);
+                    strcat(noteName,"_note.txt");
+					wipeProjectNote(projectName,noteName);
 				}
 				break;
 			}
@@ -290,29 +301,36 @@ void createNote(const char *folderName, const char *fileName) {
         exit(EXIT_FAILURE);
     }
     char fullPath[256];
-    snprintf(fullPath, sizeof(fullPath), "%s/%s", currentDir, folderName);
-    FILE *file = fopen(fullPath, "w");
+    snprintf(fullPath, sizeof(fullPath), "%s/%s/%s", currentDir, folderName, fileName);
+    FILE *file = fopen(fullPath, "a");
     if (file == NULL) {
         perror("Error creating file");
         exit(EXIT_FAILURE);
     }
-    fprintf(file, "Hello, this is a sample text file!\n");
+    char *buffer=(char*)malloc(512*sizeof(char));
+    printf("Enter note text:\n");
+    getchar();
+    fgets(buffer,512,stdin);
+    DATETIME current;
+	current = getCurrentDateTime();
+	fprintf(file,"%d/%d/%d %d:%d:%d\t",current.day,current.month,current.year,current.hour,current.minute,current.second);
+    fprintf(file, "%s\n",buffer);
     fclose(file);
-    printf("File '%s' created successfully in folder '%s'.\n", fileName, fullPath);
+    free(buffer);
+    printf("File '%s' created successfully in folder '%s'.\n", fileName, folderName);
 }
 
-void globalNote(void){
-	char *text = (char *)malloc(512*sizeof(char));
-	printf("Enter text:\n");
-	getchar();
-	fgets(text,512,stdin);
-	FILE *fptr = fopen("notes.txt","a");
-	if (fptr==NULL){
-		printf("Error opening notes\n");
-		free(text);
-		return;
-	}
-	
+void globalNote(void) {
+    char *text = (char *) malloc(512 * sizeof(char));
+    printf("Enter text:\n");
+    getchar();
+    fgets(text, 512, stdin);
+    FILE *fptr = fopen("notes.txt", "a");
+    if (fptr == NULL) {
+        printf("Error opening notes\n");
+        free(text);
+        return;
+    }
 	DATETIME current;
 	current = getCurrentDateTime();
 	fprintf(fptr,"%d/%d/%d %d:%d:%d\t",current.day,current.month,current.year,current.hour,current.minute,current.second);
@@ -321,6 +339,22 @@ void globalNote(void){
 	fclose(fptr);
 }
 
+void wipeProjectNote(const char *folderName, const char *fileName) {
+    char currentDir[256];
+    if (getcwd(currentDir, sizeof(currentDir)) == NULL) {
+        perror("Error getting current working directory");
+        exit(EXIT_FAILURE);
+    }
+    char fullPath[256];
+    snprintf(fullPath, sizeof(fullPath), "%s/%s/%s", currentDir, folderName, fileName);
+    FILE *file = fopen(fullPath, "w");
+    if (file == NULL) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+    fclose(file);
+    printf("File '%s' wiped successfully in folder '%s'.\n", fileName, folderName);
+}
 void globalNoteWipe(void){
 	FILE *fptr = fopen("notes.txt","w");
 	fprintf(fptr,"");
