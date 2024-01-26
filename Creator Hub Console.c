@@ -24,8 +24,10 @@ int readConfig(void);
 void wipeConfig(void);
 void bugReport(char *reason);
 DATETIME getCurrentDateTime(void);
-void debugcfg(void);
+void debug(void);
 void createNote(const char *folderName, const char *fileName);
+void globalNote(void);
+void globalNoteWipe(void);
 const char username[]="admin";
 const int pass=123456;
 //username and password are temporary
@@ -53,6 +55,7 @@ int main(void){
 					printf(".authorise: enter username and password to access more features\n");
 					printf(".project-n: create new project folder\n");
                     printf(".project-note-n: creates a note for a specific project\n");
+                    printf(".note-a: add notes to global note\n");
 					printf(".exit: exit the program\n");
 				}
 				if (strcmp(userInput,".clear")==0){
@@ -74,6 +77,9 @@ int main(void){
                     strcat(noteName,"_note.txt");
                     createNote(projectName,noteName);
                 }
+                if (strcmp(userInput,".note-a")==0){
+                	globalNote();
+				}
 				break;
 			}
 			case '!':{
@@ -87,6 +93,7 @@ int main(void){
 						printf(".authorise: enter username and password to access more features\n");
 						printf(".project-n: create new project folder\n");
                         printf(".project-note-n: creates a note for a specific project\n");
+                        printf(".note-a: add notes to global note\n");
 						printf("!mods-enable: enables modding and creates a mods folder\n");
 						printf("!cfg-update: reads the cfg file and updates the app accordingly\n");
 						printf(".exit: exit the program\n");
@@ -104,15 +111,19 @@ int main(void){
 				if (strcmp(userInput,"-help")==0){
 					printf("Debug commands:\n");
 					printf("-help: shows debug commands\n");
-					printf("-debugcfg: Tries to write to config, wipes config and logs bug if it fails\n");
+					printf("-debug: Tries to write to config, wipes config and logs bug if it fails\n");
 					printf("-wipecfg: Manually wipes the config file\n");
+					printf("-wipeGlobalnotes: Wipes the contents of the global note file\n");
 				}
-				if (strcmp(userInput,"-debugcfg")==0){
+				if (strcmp(userInput,"-debug")==0){
 					system("cls");
-					debugcfg();
+					debug();
 				}
 				if (strcmp(userInput,"-wipecfg")==0){
 					wipeConfig();
+				}
+				if (strcmp(userInput,"-wipeGlobalnotes")==0){
+					globalNoteWipe();
 				}
 				break;
 			}
@@ -233,7 +244,7 @@ void wipeConfig(void){
 	fclose(fptr);
 }
 
-void debugcfg(void){
+void debug(void){
 	int count=0;
 	system("cls");
 	while (readConfig()==-1&&count<5){
@@ -244,6 +255,14 @@ void debugcfg(void){
 		wipeConfig();
 		bugReport("Error_Failed_To_Read_Config\n");
 	}
+	if (feof(stdin)) {
+	    printf("End of file encountered\n");
+	    bugReport("Error_EOF_stdin\n");
+	} else if (ferror(stdin)) {
+	    printf("Error reading from stdin");
+	    bugReport("Error_stdin\n");
+	}
+
 }
 
 void createNote(const char *folderName, const char *fileName) {
@@ -262,4 +281,30 @@ void createNote(const char *folderName, const char *fileName) {
     fprintf(file, "Hello, this is a sample text file!\n");
     fclose(file);
     printf("File '%s' created successfully in folder '%s'.\n", fileName, fullPath);
+}
+
+void globalNote(void){
+	char *text = (char *)malloc(512*sizeof(char));
+	printf("Enter text:\n");
+	getchar();
+	fgets(text,512,stdin);
+	FILE *fptr = fopen("notes.txt","a");
+	if (fptr==NULL){
+		printf("Error opening notes\n");
+		free(text);
+		return;
+	}
+	
+	DATETIME current;
+	current = getCurrentDateTime();
+	fprintf(fptr,"%d/%d/%d %d:%d:%d\t",current.day,current.month,current.year,current.hour,current.minute,current.second);
+	fputs(text,fptr);
+	free(text);
+	fclose(fptr);
+}
+
+void globalNoteWipe(void){
+	FILE *fptr = fopen("notes.txt","w");
+	fprintf(fptr,"");
+	fclose(fptr);
 }
