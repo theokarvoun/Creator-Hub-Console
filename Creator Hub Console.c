@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <libgen.h>
+#include <unistd.h>
 
 typedef struct DateTime {
     int year;
@@ -23,7 +25,7 @@ void wipeConfig(void);
 void bugReport(char *reason);
 DATETIME getCurrentDateTime(void);
 void debugcfg(void);
-
+void createNote(const char *folderName, const char *fileName);
 const char username[]="admin";
 const int pass=123456;
 //username and password are temporary
@@ -50,6 +52,7 @@ int main(void){
 					printf(".clear: clears the console\n");
 					printf(".authorise: enter username and password to access more features\n");
 					printf(".project-n: create new project folder\n");
+                    printf(".project-note-n: creates a note for a specific project\n");
 					printf(".exit: exit the program\n");
 				}
 				if (strcmp(userInput,".clear")==0){
@@ -62,6 +65,15 @@ int main(void){
 				if (strcmp(userInput,".project-n")==0){
 					createProject();
 				}
+                if (strcmp(userInput,".project-note-n")==0){
+                    char projectName[100];
+                    char noteName[100];
+                    printf("Give project name: ");
+                    scanf("%s",projectName);
+                    strcpy(noteName,projectName);
+                    strcat(noteName,"_note.txt");
+                    createNote(projectName,noteName);
+                }
 				break;
 			}
 			case '!':{
@@ -74,6 +86,7 @@ int main(void){
 						printf(".clear: clears the console\n");
 						printf(".authorise: enter username and password to access more features\n");
 						printf(".project-n: create new project folder\n");
+                        printf(".project-note-n: creates a note for a specific project\n");
 						printf("!mods-enable: enables modding and creates a mods folder\n");
 						printf("!cfg-update: reads the cfg file and updates the app accordingly\n");
 						printf(".exit: exit the program\n");
@@ -231,4 +244,22 @@ void debugcfg(void){
 		wipeConfig();
 		bugReport("Error_Failed_To_Read_Config\n");
 	}
+}
+
+void createNote(const char *folderName, const char *fileName) {
+    char currentDir[256];
+    if (getcwd(currentDir, sizeof(currentDir)) == NULL) {
+        perror("Error getting current working directory");
+        exit(EXIT_FAILURE);
+    }
+    char fullPath[256];
+    snprintf(fullPath, sizeof(fullPath), "%s/%s", currentDir, folderName);
+    FILE *file = fopen(fullPath, "w");
+    if (file == NULL) {
+        perror("Error creating file");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(file, "Hello, this is a sample text file!\n");
+    fclose(file);
+    printf("File '%s' created successfully in folder '%s'.\n", fileName, fullPath);
 }
