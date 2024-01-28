@@ -29,6 +29,7 @@ void createNote(const char *folderName, const char *fileName);
 void wipeProjectNote(const char *folderName, const char *fileName);
 void globalNote(void);
 void globalNoteWipe(void);
+void openProjectnote(char *folderName,char *fileName);
 
 const char username[]="admin";
 const int pass=123456;
@@ -63,7 +64,9 @@ int main(void){
 					printf(".authorise: enter username and password to access more features\n");
 					printf(".project-n: create new project folder\n");
                     printf(".project-note-n: creates a note for a specific project\n");
+                    printf(".project-note-o: opens project note file\n");
                     printf(".note-a: add notes to global note\n");
+                    printf(".note-o: open global note file\n");
 					printf(".exit: exit the program\n");
 				}
 				if (strcmp(userInput,".clear")==0){
@@ -94,6 +97,18 @@ int main(void){
 				if (strcmp(userInput,".cleanMode-off")==0){
 					cleanMode=false;
 				}
+				if (strcmp(userInput,".note-o")==0){
+					system("notes.txt");
+				}
+				if (strcmp(userInput,".project-note-o")==0){
+					char projectName[100];
+                    char noteName[100];
+                    printf("Give project name: ");
+                    scanf("%s",projectName);
+                    strcpy(noteName,projectName);
+                    strcat(noteName,"_note.txt");
+                    openProjectnote(projectName,noteName);
+				}
 				break;
 			}
 			case '!':{
@@ -109,7 +124,9 @@ int main(void){
 						printf(".authorise: enter username and password to access more features\n");
 						printf(".project-n: create new project folder\n");
                         printf(".project-note-n: creates a note for a specific project\n");
+                        printf(".project-note-o: opens project note file\n");
                         printf(".note-a: add notes to global note\n");
+                        printf(".note-o: open global note file\n");
 						printf("!mods-enable: enables modding and creates a mods folder\n");
 						printf("!cfg-update: reads the cfg file and updates the app accordingly\n");
 						printf("!reset: resets the app to default\n");
@@ -338,7 +355,6 @@ void createNote(const char *folderName, const char *fileName) {
     fprintf(file, "%s\n",buffer);
     fclose(file);
     free(buffer);
-    printf("File '%s' created successfully in folder '%s'.\n", fileName, folderName);
 }
 
 void globalNote(void) {
@@ -374,10 +390,20 @@ void wipeProjectNote(const char *folderName, const char *fileName) {
         exit(EXIT_FAILURE);
     }
     fclose(file);
-    printf("File '%s' wiped successfully in folder '%s'.\n", fileName, folderName);
 }
 void globalNoteWipe(void){
 	FILE *fptr = fopen("notes.txt","w");
 	fprintf(fptr,"");
 	fclose(fptr);
+}
+
+void openProjectnote(char *folderName,char *fileName){
+	char currentDir[256];
+    if (getcwd(currentDir, sizeof(currentDir)) == NULL) {
+        perror("Error getting current working directory");
+        exit(EXIT_FAILURE);
+    }
+    char fullPath[256];
+    snprintf(fullPath, sizeof(fullPath), "%s/%s/%s", currentDir, folderName, fileName);
+    system(fullPath);
 }
