@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <windows.h>
+#include <direct.h>
 #include <libgen.h>
 #include <unistd.h>
 
@@ -15,6 +17,9 @@ typedef struct DateTime {
     int minute;
     int second;
 }DATETIME;
+
+typedef void (*PluginFunction)();
+
 
 void authorise(void);
 void createProject(void);
@@ -30,6 +35,13 @@ void wipeProjectNote(const char *folderName, const char *fileName);
 void globalNote(void);
 void globalNoteWipe(void);
 void openProjectnote(char *folderName,char *fileName);
+PluginFunction *loadPlugins(const char *pluginDir);
+
+
+typedef PluginFunction (*LoadPluginsFunction)(const char *);
+
+
+
 
 const char username[]="admin";
 const int pass=123456;
@@ -45,6 +57,22 @@ int main(int argc, char **argv){
 	if ((argv[1]!=NULL) && (strcmp(argv[1],"-mod")==0)){
 		printf("Files in mods folder\n");
 		system("pwsh -c ls ./mods");
+		PluginFunction *mods = loadPlugins("./mods");
+
+    // Check if plugins were loaded successfully
+    if (mods == NULL) {
+        printf("Failed to load plugins\n");
+        return 1;
+    }
+
+    // Iterate through the array of loaded plugins and call each plugin function
+    for (PluginFunction *func = mods; *func != NULL; ++func) {
+        printf("Executing plugin function...\n");
+        (*func)();
+    }
+
+    // Free the memory allocated for the array of function pointers
+    free(mods);
 	}
 	
 	char userInput[100];
@@ -429,4 +457,64 @@ void openProjectnote(char *folderName,char *fileName){
     char fullPath[256];
     snprintf(fullPath, sizeof(fullPath), "%s/%s/%s", currentDir, folderName, fileName);
     system(fullPath);
+}
+
+// Modify loadPlugins function to return an array of loaded plugin functions
+PluginFunction *loadPlugins(const char *pluginDir) {
+    WIN32_FIND_DATA findFileData;
+    HANDLE hFind;
+
+    char searchPath[256];
+    snprintf(searchPath, sizeof(searchPath), "%s\\*.dll", pluginDir);
+
+    hFind = FindFirstFile(searchPath, &findFileData);
+    if (hFind == INVALID_HANDLE_VALUE) {
+        printf("No plugins found in %s\n", pluginDir);
+        return NULL;
+    }
+
+    PluginFunction *pluginFunctions = NULL;
+    int numPlugins = 0;
+
+    do {
+        char path[256];
+        snprintf(path, sizeof(path), "%s\\%s", pluginDir, findFileData.cFileName);
+
+        HMODULE hModule = LoadLibrary(path);
+        if (hModule == NULL) {
+            fprintf(stderr, "Error loading plugin %s\n", findFileData.cFileName);
+            continue;
+        }
+
+        PluginFunction func = (PluginFunction)GetProcAddress(hModule, "plugin_function");
+        if (func == NULL) {
+            fprintf(stderr, "Error resolving symbol in plugin %s\n", findFileData.cFileName);
+            FreeLibrary(hModule);
+            continue;
+        }
+
+        // Allocate memory for the plugin function pointers
+        pluginFunctions = realloc(pluginFunctions, (numPlugins + 1) * sizeof(PluginFunction));
+        if (pluginFunctions == NULL) {
+            fprintf(stderr, "Error allocating memory for plugin functions\n");
+            FreeLibrary(hModule);
+            continue;
+        }
+
+        // Store the plugin function pointer
+        pluginFunctions[numPlugins++] = func;
+
+    } while (FindNextFile(hFind, &findFileData) != 0);
+
+    FindClose(hFind);
+
+    // Null-terminate the array of function pointers
+    pluginFunctions = realloc(pluginFunctions, (numPlugins + 1) * sizeof(PluginFunction));
+    if (pluginFunctions == NULL) {
+        fprintf(stderr, "Error allocating memory for plugin functions\n");
+        return NULL;
+    }
+    pluginFunctions[numPlugins] = NULL;
+
+    return pluginFunctions;
 }
