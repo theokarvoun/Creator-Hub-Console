@@ -37,10 +37,16 @@ const int pass=123456;
 
 bool auth;
 bool moded;
+bool mods_installed;
 bool cleanMode;
 
-int main(void){
+int main(int argc, char **argv){
 	readConfig();
+	if ((argv[1]!=NULL) && (strcmp(argv[1],"-mod")==0)){
+		printf("Files in mods folder\n");
+		system("pwsh -c ls ./mods");
+	}
+	
 	char userInput[100];
 	while (strcmp(userInput,".exit")!=0){
 		if (cleanMode==false){
@@ -128,12 +134,20 @@ int main(void){
                         printf(".note-a: add notes to global note\n");
                         printf(".note-o: open global note file\n");
 						printf("!mods-enable: enables modding and creates a mods folder\n");
+						printf("!mods-install: loads mods from the mods folder\n");
 						printf("!cfg-update: reads the cfg file and updates the app accordingly\n");
 						printf("!reset: resets the app to default\n");
 						printf(".exit: exit the program\n");
 					}
 					if (strcmp(userInput,"!mods-enable")==0){
 						createModsFolder();
+					}
+					if (strcmp(userInput,"!mods-install")==0){
+						printf("Application will restart\n");
+						mods_installed=true;
+						writeToConfig();
+						system(".\\Creator-Hub-Console -mod");
+						return 0;
 					}
 					if (strcmp(userInput,"!cfg-update")==0){
 						readConfig();
@@ -167,6 +181,7 @@ int main(void){
 					printf("-wipecfg: Manually wipes the config file\n");
 					printf("-wipeGlobalnotes: Wipes the contents of the global note file\n");
 					printf("-wipeProjectNote: Wipes the contents of a note file of a specific project\n");
+					printf("-shell: gives the user a shell\n");
 				}
 				if (strcmp(userInput,"-debug")==0){
 					system("cls");
@@ -186,6 +201,9 @@ int main(void){
                     strcpy(noteName,projectName);
                     strcat(noteName,"_note.txt");
 					wipeProjectNote(projectName,noteName);
+				}
+				if (strcmp(userInput,"-shell")==0){
+					system("pwsh");
 				}
 				break;
 			}
@@ -256,18 +274,18 @@ void writeToConfig(void){
 		printf("Error opening file\n");
 		return;
 	}
-	fprintf(fptr,"auth:%d\nmoded:%d\ncleanMode:%d",auth?1:0,moded?1:0,cleanMode?1:0);
+	fprintf(fptr,"auth:%d\nmoded:%d\ncleanMode:%d\nloaded mods:%d",auth?1:0,moded?1:0,cleanMode?1:0,mods_installed?1:0);
 	fclose(fptr);
 }
 
 int readConfig(void){
-	int temp_auth,temp_mod,temp_clean;
+	int temp_auth,temp_mod,temp_clean,mods_loaded;
 	FILE *fptr = fopen("config.cfg","r");
 	if (fptr==NULL){
 		printf("Error opening file\n");
 		return -1;
 	}
-	fscanf(fptr,"auth:%d\nmoded:%d\ncleanMode:%d",&temp_auth,&temp_mod,&temp_clean);
+	fscanf(fptr,"auth:%d\nmoded:%d\ncleanMode:%d\nloaded mods:%d",&temp_auth,&temp_mod,&temp_clean,&mods_loaded);
 	fclose(fptr);
 	if (temp_auth==1){
 		auth=true;
@@ -283,6 +301,11 @@ int readConfig(void){
 		cleanMode=true;
 	} else {
 		cleanMode=false;
+	}
+	if (mods_loaded==1){
+		mods_installed=true;
+	} else {
+		mods_installed=false;
 	}
 	return 0;
 }
