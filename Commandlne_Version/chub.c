@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 
 int createProject(char *str);
+void createSubFolder(char *name);
 
 int main(int argc,char **argv){
     if (argv[1] == NULL){
@@ -39,8 +40,30 @@ int main(int argc,char **argv){
 
 int createProject(char *str){
     if (mkdir(str) == 0) {
+        char *temp = (char*)malloc(50*sizeof(char));
+        strcpy(temp,str);
+        strcat(temp,"\\footage");
+        createSubFolder(temp);
+        free(temp);
+        temp = (char*)malloc(50*sizeof(char));
+        strcpy(temp,str);
+        strcat(temp,"\\sfx");
+        createSubFolder(temp);
+        free(temp);
+        temp = (char*)malloc(50*sizeof(char));
+        strcpy(temp,str);
+        strcat(temp,"\\clips");
+        createSubFolder(temp);
+        free(temp);
         return 0;
     } else {
         return 1;
+    }
+}
+
+void createSubFolder(char *name){
+    if (mkdir(name)){
+        fputs("Couldn't create subfolder",stderr);
+        return;
     }
 }
