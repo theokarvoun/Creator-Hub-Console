@@ -48,7 +48,7 @@ int main(int argc,char **argv){
 }
 
 int createProject(char *str){
-    if (mkdir(str) == 0) {
+    if (!mkdir(str)) {
         char *temp = (char*)malloc(50*sizeof(char));
         strcpy(temp,str);
         strcat(temp,"\\footage");
