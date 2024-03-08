@@ -41,6 +41,9 @@ int main(int argc,char **argv){
     if (strcmp(argv[1],"-console")==0){
         system("Creator-Hub-Console.exe");
     }
+    if (strcmp(argv[1],"-shell")==0){
+        system("powershell");
+    }
     return 0;
 }
 
