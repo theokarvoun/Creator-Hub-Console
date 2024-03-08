@@ -11,8 +11,14 @@ int main(int argc,char **argv){
         fputs("More arguments needed",stderr);
         return 1;
     }
+    if (strcmp(argv[1],"-version")==0){
+        printf("chub version alpha-0.0.1\n");
+        printf("Made by theokarvoun\n");
+        printf("Check for newer versions on: https://github.com/theokarvoun/Creator-Hub-Console/tree/main/Commandlne_Version\n");
+    }
     if ((strcmp(argv[1],"-h")==0)||(strcmp(argv[1],"-help")==0)){
         printf("-h or -help: shows commands\n");
+        printf("-version: displays the current version\n");
         printf("-init <project name>: creates a new project folder in the current directory\n");
         printf("-console: launches the console version of the app\n");
     }
