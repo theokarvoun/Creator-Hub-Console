@@ -11,17 +11,6 @@ int main(int argc,char **argv){
         fputs("More arguments needed",stderr);
         return 1;
     }
-    if (strcmp(argv[1],"-version")==0){
-        printf("chub version alpha-0.0.1\n");
-        printf("Made by theokarvoun\n");
-        printf("Check for newer versions on: https://github.com/theokarvoun/Creator-Hub-Console/tree/main/Commandlne_Version\n");
-    }
-    if ((strcmp(argv[1],"-h")==0)||(strcmp(argv[1],"-help")==0)){
-        printf("-h or -help: shows commands\n");
-        printf("-version: displays the current version\n");
-        printf("-init <project name>: creates a new project folder in the current directory\n");
-        printf("-console: launches the console version of the app\n");
-    }
     if (strcmp(argv[1],"-init")==0){
         if (argv[2]==NULL){
             fputs("More arguments needed",stderr);
@@ -30,7 +19,7 @@ int main(int argc,char **argv){
         switch (createProject(argv[2])){
             case 0:{
                 printf("Project created successfully\n");
-                break;
+                return 0;
             }
             case 1:{
                 fputs("An error occured during project creation\n",stderr);
@@ -38,13 +27,29 @@ int main(int argc,char **argv){
             }
         }
     }
+    if (strcmp(argv[1],"-version")==0){
+        printf("chub version alpha-0.0.1\n");
+        printf("Made by theokarvoun\n");
+        printf("Check for newer versions on: https://github.com/theokarvoun/Creator-Hub-Console/tree/main/Commandlne_Version\n");
+        return 0;
+    }
+    if ((strcmp(argv[1],"-h")==0)||(strcmp(argv[1],"-help")==0)){
+        printf("-h or -help: shows commands\n");
+        printf("-version: displays the current version\n");
+        printf("-init <project name>: creates a new project folder in the current directory\n");
+        printf("-console: launches the console version of the app\n");
+        return 0;
+    }
     if (strcmp(argv[1],"-console")==0){
         system("Creator-Hub-Console.exe");
+        return 0;
     }
     if (strcmp(argv[1],"-shell")==0){
         system("powershell");
+        return 0;
     }
-    return 0;
+    fputs("Invalid command.\nUse -help or -h to show commands.",stderr);
+    return 1;
 }
 
 int createProject(char *str){
