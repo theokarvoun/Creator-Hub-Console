@@ -28,7 +28,7 @@ int main(int argc,char **argv){
         }
     }
     if (strcmp(argv[1],"-version")==0){
-        printf("chub version alpha-0.0.1\n");
+        printf("chub version alpha-0.0.1-C\n");
         printf("Made by theokarvoun\n");
         printf("Check for newer versions on: https://github.com/theokarvoun/Creator-Hub-Console/tree/main/Commandlne_Version\n");
         return 0;
