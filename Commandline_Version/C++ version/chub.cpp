@@ -9,12 +9,12 @@ void createSubFolder(char *name);
 
 int main(int argc,char **argv){
     if (argv[1] == NULL){
-        stderr;std::cout << args_err << std::endl;
+        std::cerr << args_err << std::endl;
         return 1;
     }
     if (strcmp(argv[1],"-init")==0){
         if (argv[2]==NULL){
-            stderr;std::cout << args_err << std::endl;
+            std::cerr << args_err << std::endl;
             return 1;
         }
         switch (createProject(argv[2])){
@@ -23,14 +23,14 @@ int main(int argc,char **argv){
                 return 0;
             }
             case 1:{
-                stderr;std::cout << "An error occured during project creation" << std::endl;
+                std::cerr << "An error occured during project creation" << std::endl;
                 return 1;
             }
         }
     }
     if (strcmp(argv[1],"-version")==0){
         using namespace std;
-        cout << "chub version alpha-0.0.1-C++" << endl;
+        cout << "chub version alpha-0.0.2-C++" << endl;
         cout << "Made by theokarvoun" << endl;
         cout << "Check for newer versions on: https://github.com/theokarvoun/Creator-Hub-Console/tree/main/Commandlne_Version" << endl;
         return 0;
@@ -79,7 +79,7 @@ int createProject(char *str){
 
 void createSubFolder(char *name){
     if (mkdir(name)){
-        fputs("Couldn't create subfolder",stderr);
+        std::cerr << "Couldn't create subfolder" << std::endl;
         return;
     }
 }
