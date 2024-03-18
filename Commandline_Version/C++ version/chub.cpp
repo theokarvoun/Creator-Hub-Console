@@ -30,7 +30,7 @@ int main(int argc, char **argv){
     }
     if (argv[1] == (std::string)"-version"){
         using namespace std;
-        cout << "chub version alpha-0.0.3-C++-dev" << endl;
+        cout << "chub version alpha-0.0.3-C++" << endl;
         cout << "Made by theokarvoun" << endl;
         cout << "Check for newer versions on: https://github.com/theokarvoun/Creator-Hub-Console/tree/main/Commandlne_Version" << endl;
         return 0;
