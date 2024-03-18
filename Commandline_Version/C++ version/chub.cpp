@@ -7,13 +7,13 @@
 int createProject(char *str);
 void createSubFolder(char *name);
 
-int main(int argc,char **argv){
-    if (argv[1] == NULL){
+int main(int argc, char **argv){
+    if (argc < 1){
         std::cerr << args_err << std::endl;
         return 1;
     }
-    if (strcmp(argv[1],"-init")==0){
-        if (argv[2]==NULL){
+    if (argv[1] == (std::string)"-init"){
+        if (argc < 2){
             std::cerr << args_err << std::endl;
             return 1;
         }
@@ -28,14 +28,14 @@ int main(int argc,char **argv){
             }
         }
     }
-    if (strcmp(argv[1],"-version")==0){
+    if (argv[1] == (std::string)"-version"){
         using namespace std;
-        cout << "chub version alpha-0.0.2-C++" << endl;
+        cout << "chub version alpha-0.0.3-C++" << endl;
         cout << "Made by theokarvoun" << endl;
         cout << "Check for newer versions on: https://github.com/theokarvoun/Creator-Hub-Console/tree/main/Commandlne_Version" << endl;
         return 0;
     }
-    if ((strcmp(argv[1],"-h")==0)||(strcmp(argv[1],"-help")==0)){
+    if ((argv[1] == (std::string)"-h") ||(argv[1] == (std::string)"-help")){
         using namespace std;
         cout << "-h or -help: shows commands" << endl;
         cout << "-version: displays the current version" << endl;
@@ -43,34 +43,36 @@ int main(int argc,char **argv){
         cout << "-console: launches the console version of the app" << endl;
         return 0;
     }
-    if (strcmp(argv[1],"-console")==0){
+    if (argv[1] == (std::string)"-console"){
         system("Creator-Hub-Console.exe");
         return 0;
     }
-    if (strcmp(argv[1],"-shell")==0){
+    if (argv[1] == (std::string)"-shell"){
         system("powershell");
         return 0;
     }
     return 0;
 }
 
+
 int createProject(char *str){
-    if (!mkdir(str)) {
-        char *temp = (char*)malloc(50*sizeof(char));
-        strcpy(temp,str);
-        strcat(temp,"\\footage");
-        createSubFolder(temp);
-        free(temp);
-        temp = (char*)malloc(50*sizeof(char));
-        strcpy(temp,str);
-        strcat(temp,"\\sfx");
-        createSubFolder(temp);
-        free(temp);
-        temp = (char*)malloc(50*sizeof(char));
-        strcpy(temp,str);
-        strcat(temp,"\\clips");
-        createSubFolder(temp);
-        free(temp);
+    if (!mkdir(str)){
+        std::string temp;
+        temp = str;
+        temp.append("\\footage");
+        //strcat(temp,"\\footage");
+        createSubFolder((char *)&temp);
+        temp.clear();
+        temp = str;
+        temp.append("\\sfx");
+        //strcat(temp,"\\sfx");
+        createSubFolder((char *)&temp);
+        temp.clear();
+        temp = str;
+        temp.append("\\clips");
+        //strcpy(temp,str);
+        //strcat(temp,"\\clips");
+        createSubFolder((char *)&temp);
         return 0;
     } else {
         return 1;
@@ -78,7 +80,7 @@ int createProject(char *str){
 }
 
 void createSubFolder(char *name){
-    if (mkdir(name)){
+    if (mkdir((char *)&name)){
         std::cerr << "Couldn't create subfolder" << std::endl;
         return;
     }
